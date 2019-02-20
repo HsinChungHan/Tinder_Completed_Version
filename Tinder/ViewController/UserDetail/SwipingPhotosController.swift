@@ -98,20 +98,23 @@ class SwipingPhotosController: UIPageViewController {
             barsStackView.addArrangedSubview(barView)
         }
         
-        view.addSubview(barsStackView)
-        barsStackView.axis = .horizontal
-        barsStackView.spacing = 4
-        barsStackView.distribution = .fillEqually
-        //先預設第一個bar的顏色為白色
-        barsStackView.arrangedSubviews.first?.backgroundColor = .white
-        //用view.safeAreaLayoutGuide.topAnchor會因為我們的SwipingPhotoController會縮放，造成barstackViews的閃爍(會一直重新調整其位置)
-        //所以我們可以給他一個固定的padding來解這個問題
-//        barsStackView.anchor(top: view.safeAreaLayoutGuide.topAnchor, bottom: nil, leading: view.leadingAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets.init(top: 8, left: 8, bottom: 8, right: 8), size: CGSize.init(width: 0, height: 4))
-        var paddingTop: CGFloat = 8
-        if !isCardViewMode{
-            paddingTop += UIApplication.shared.statusBarFrame.height
+        if cardViewModel.imageUrls.count > 1{
+            view.addSubview(barsStackView)
+            barsStackView.axis = .horizontal
+            barsStackView.spacing = 4
+            barsStackView.distribution = .fillEqually
+            //先預設第一個bar的顏色為白色
+            barsStackView.arrangedSubviews.first?.backgroundColor = .white
+            //用view.safeAreaLayoutGuide.topAnchor會因為我們的SwipingPhotoController會縮放，造成barstackViews的閃爍(會一直重新調整其位置)
+            //所以我們可以給他一個固定的padding來解這個問題
+            //        barsStackView.anchor(top: view.safeAreaLayoutGuide.topAnchor, bottom: nil, leading: view.leadingAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets.init(top: 8, left: 8, bottom: 8, right: 8), size: CGSize.init(width: 0, height: 4))
+            var paddingTop: CGFloat = 8
+            if !isCardViewMode{
+                paddingTop += UIApplication.shared.statusBarFrame.height
+            }
+            barsStackView.anchor(top: view.topAnchor, bottom: nil, leading: view.leadingAnchor, trailing: view.trailingAnchor, padding: .init(top: paddingTop, left: 8, bottom: 8, right: 8), size: .init(width: 0, height: 4))
         }
-        barsStackView.anchor(top: view.topAnchor, bottom: nil, leading: view.leadingAnchor, trailing: view.trailingAnchor, padding: .init(top: paddingTop, left: 8, bottom: 8, right: 8), size: .init(width: 0, height: 4))
+        
     }
     
 }

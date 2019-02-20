@@ -126,11 +126,9 @@ class HomeViewController: UIViewController {
     fileprivate func setupFirestoreUserCards(){
         cardViewModels.forEach { (cardVM) in
             let cardView = CardView.init(frame: .zero)
-
             cardView.setupViewModel(viewModel: cardVM)
             cardsDeckView.addSubview(cardView)
             cardView.fillSuperView()
-            
         }
     }
     
@@ -176,7 +174,7 @@ class HomeViewController: UIViewController {
                     
                     previousCardView?.nextCardView = cardView
                     previousCardView = cardView
-                    
+
                     if self.topCardView == nil{
                         self.topCardView = cardView
                     }
@@ -231,6 +229,7 @@ class HomeViewController: UIViewController {
     }
     
     @objc func handleLike(){
+        topCardView?.likeImageView.alpha = 1.0
         saveSwipeToFireStore(didLike: 1)
         performSwipAnimation(translation: 700, angle: 15)
     }
@@ -315,6 +314,7 @@ class HomeViewController: UIViewController {
     
     
     @objc func handleDislike(){
+        topCardView?.nopeImageView.alpha = 1.0
         saveSwipeToFireStore(didLike: 0)
         performSwipAnimation(translation: -700, angle: -15)
 

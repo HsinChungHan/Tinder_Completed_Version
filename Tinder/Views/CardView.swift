@@ -23,39 +23,26 @@ class CardView: UIView {
     
     var cardViewModel: CardViewModel!{
         didSet{
-            //accessing index 0 will crash, if images.count == 0
-//            let imageName = cardViewModel.imageUrls.first ?? ""
-//            imageView.image = UIImage.init(named: imageName)
-            //load our image using url instead of image name
-//            if let imageUrl = URL.init(string: imageName){
-//                imageView.sd_setImage(with: imageUrl)
-                
-//                imageView.sd_setImage(with: imageUrl, placeholderImage: #imageLiteral(resourceName: "photo_placeholder"), options: .continueInBackground)
-//            }
-            
             swipingPhotoController.cardViewModel = cardViewModel
 
             informationLabel.textAlignment = cardViewModel.textAlignment
             informationLabel.attributedText = cardViewModel.attributedString
             
             //some dummy bars for now
-            (0..<cardViewModel.imageUrls.count).forEach { (_) in
-                let view = UIView()
-                view.backgroundColor = barDeselectedColor
-                barStackView.addArrangedSubview(view)
-            }
-            
-            barStackView.arrangedSubviews.first?.backgroundColor = UIColor.white
+//            (0..<cardViewModel.imageUrls.count).forEach { (_) in
+//                let view = UIView()
+//                view.backgroundColor = barDeselectedColor
+//                barStackView.addArrangedSubview(view)
+//            }
+//            barStackView.arrangedSubviews.first?.backgroundColor = UIColor.white
             setupImageIndexObserver()
+            
+            
         }
     }
     
     fileprivate func setupImageIndexObserver(){
         cardViewModel.imageIndexObserver = {[unowned self] (imageUrl, imageIndex) in
-//            self?.imageView.image = image
-//            self.imageView.sd_setImage(with: imageUrl)
-//            self.imageView.sd_setImage(with: imageUrl, placeholderImage: #imageLiteral(resourceName: "photo_placeholder"), options: .continueInBackground, completed: nil)
-            
             self.barStackView.arrangedSubviews.forEach {(subview) in
                 subview.backgroundColor = self.barDeselectedColor
             }
@@ -74,12 +61,6 @@ class CardView: UIView {
     //MARK:- Configuration
     let threhold: CGFloat = 100
     
-//    fileprivate let imageView: UIImageView = {
-//        let imv = UIImageView.init(image: #imageLiteral(resourceName: "lady2-a"))
-//        imv.contentMode = .scaleAspectFill
-//        imv.clipsToBounds = true
-//        return imv
-//    }()
     //Replace it with a UIPageViewController component which is our SwipingPhotoViewController
     fileprivate let swipingPhotoController = SwipingPhotosController.init(isCardViewMode: true)
     
@@ -92,14 +73,6 @@ class CardView: UIView {
         return lb
     }()
     
-    
-    //    fileprivate let imageView: UIImageView = {
-    //        let imv = UIImageView.init(image: #imageLiteral(resourceName: "girl"))
-    //        imv.contentMode = .scaleAspectFill
-    //        imv.clipsToBounds = true
-    //        return imv
-    //    }()
-    
     lazy var moreInfoButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setImage(#imageLiteral(resourceName: "info_icon").withRenderingMode(.alwaysOriginal), for: .normal)
@@ -108,23 +81,31 @@ class CardView: UIView {
     }()
     
     @objc func handlePressMoreInfo(sender: UIButton){
-        //present function is missing here
-        //hack solution
-//        let homeVC = UIApplication.shared.keyWindow?.rootViewController
-//        let userDetailController = UserDetailController()
-//        homeVC?.present(userDetailController, animated: true, completion: nil)
-        
         //delegate solution
         delegate?.didPressMoreInfoButton(cardViewModel: cardViewModel)
         
     }
     
+    let likeImageView: UIImageView = {
+       let imv = UIImageView.init(image: #imageLiteral(resourceName: "like"))
+        imv.contentMode = .scaleAspectFill
+        imv.clipsToBounds = true
+        imv.alpha = 0
+        return imv
+    }()
+    
+    let nopeImageView: UIImageView = {
+        let imv = UIImageView.init(image: #imageLiteral(resourceName: "nope"))
+        imv.contentMode = .scaleAspectFill
+        imv.clipsToBounds = true
+        imv.alpha = 0
+        return imv
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
-
         setupPanGesture()
-        
         setupTapGesture()
     }
     
@@ -202,6 +183,12 @@ class CardView: UIView {
         addSubview(moreInfoButton)
         moreInfoButton.anchor(top: nil, bottom: bottomAnchor, leading: nil, trailing: trailingAnchor, padding: .init(top: 0, left: 0, bottom: 16, right: 16), size: .init(width: 44, height: 44))
         
+        addSubview(likeImageView)
+        likeImageView.anchor(top: topAnchor, bottom: nil, leading: leadingAnchor, trailing: nil, padding: .init(top: 16, left: 16, bottom: 0, right: 0), size: .init(width: 130, height: 130))
+        
+        addSubview(nopeImageView)
+        nopeImageView.anchor(top: topAnchor, bottom: nil, leading: nil, trailing: trailingAnchor, padding: .init(top: 16, left: 0, bottom: 0, right: 16), size: .init(width: 150, height: 150))
+        
     }
     
     fileprivate func setupGradientLayer(){
@@ -217,11 +204,12 @@ class CardView: UIView {
     fileprivate let barStackView = UIStackView()
     
     fileprivate func setupBarStackView(){
-        addSubview(barStackView)
-        barStackView.anchor(top: topAnchor, bottom: nil, leading: leadingAnchor, trailing: trailingAnchor, padding: .init(top: 8, left: 8, bottom: 0, right: 8), size: .init(width: 0, height: 4))
-        barStackView.spacing = 4
-        barStackView.distribution = .fillEqually
-        
+        if cardViewModel.imageUrls.count > 1{
+            addSubview(barStackView)
+            barStackView.anchor(top: topAnchor, bottom: nil, leading: leadingAnchor, trailing: trailingAnchor, padding: .init(top: 8, left: 8, bottom: 0, right: 8), size: .init(width: 0, height: 4))
+            barStackView.spacing = 4
+            barStackView.distribution = .fillEqually
+        }
     }
     
     override func layoutSubviews() {
@@ -239,41 +227,17 @@ class CardView: UIView {
             guard let homeVC = delegate as? HomeViewController else {return}
             if translationDirection == 1{
                 homeVC.handleLike()
+                
             }else{
                 homeVC.handleDislike()
             }
         }else{
             UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.1, options: .curveEaseOut, animations: {[unowned self] in
+                self.nopeImageView.alpha = 0.0
+                self.likeImageView.alpha = 0.0
                 self.transform = .identity
             })
         }
-       
-        
-        
-        
-        
-        
-//        UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.1, options: .curveEaseOut, animations: {[unowned self] in
-//            if shouldDismissedCard{
-//                //這樣的寫法會有一點不好，他卡片在飛出去的時候，會往上跳一下(jumping Affect)
-//                //                let offSecreenTransform = self?.transform.translatedBy(x: 1000, y: 0)
-//                //                self?.transform = offSecreenTransform!
-//
-//                self.frame = CGRect.init(x: 600 * translationDirection, y: 0, width: self.frame.width, height: self.frame.height)
-//            }else{
-//                self.transform = .identity
-//            }
-//        }) { (completed) in
-//            self.transform = .identity
-//            //在拖拉的過程時，frame的寬高會改變，所以需要用superView的寬高
-//            //                self?.frame = CGRect.init(x: 0, y: 0, width: (self?.superview?.frame.width)! , height: (self?.superview?.frame.height)!)
-//            if shouldDismissedCard{
-//                self.removeFromSuperview()
-//
-//                //reset topCarView inside of HomeViewController somehow
-//                self.delegate?.didRemoveCard(cardView: self)
-//            }
-//        }
     }
     
     fileprivate func handledChanged(_ gesture: UIPanGestureRecognizer) {
@@ -285,5 +249,13 @@ class CardView: UIView {
         let rotationTransformation = CGAffineTransform.init(rotationAngle: angle)
         transform = rotationTransformation.translatedBy(x: translation.x, y: translation.y)
         //        transform = CGAffineTransform.init(translationX: translation.x, y: translation.y)
+        
+        print("translation: \(translation.x/frame.width * 3)")
+        if translation.x > 0{
+            likeImageView.alpha = translation.x/frame.width * 3
+        }else{
+            nopeImageView.alpha = -translation.x/frame.width * 3
+        }
+        
     }
 }
