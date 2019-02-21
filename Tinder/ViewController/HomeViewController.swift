@@ -31,6 +31,10 @@ class HomeViewController: UIViewController {
         bottomControlsStackView.dislikeButton.addTarget(self, action: #selector(handleDislike), for: .touchUpInside)
         setupLayout()
         fetchCurrentUser()
+        
+        
+        
+        
 //        setupFirestoreUserCards()
 //        fetchUserFromFirestore()
         
@@ -40,6 +44,7 @@ class HomeViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         //you want to kick urser out when they log out
+        print(Auth.auth().currentUser?.uid)
         if Auth.auth().currentUser == nil{
             let registrationController = RegistrationController()
             registrationController.delegate = self

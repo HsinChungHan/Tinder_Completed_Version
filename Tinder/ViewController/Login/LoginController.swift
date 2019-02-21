@@ -99,6 +99,7 @@ class LoginController: UIViewController {
         setupGradientLayer()
         setupLayout()
         setupBindables()
+        setupTapGesture()
     }
     
     fileprivate let loginViewModel = LoginViewModel()
@@ -148,4 +149,16 @@ class LoginController: UIViewController {
         backToRegisterButton.anchor(top: nil, bottom: view.safeAreaLayoutGuide.bottomAnchor, leading: view.leadingAnchor, trailing: view.trailingAnchor)
     }
 
+    fileprivate func setupTapGesture(){
+        let tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleTapDismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func handleTapDismissKeyboard(gesture: UITapGestureRecognizer?){
+        view.endEditing(true) //dismiss keyboard
+        UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {[weak self] in
+            self?.view.transform = CGAffineTransform.identity
+            }, completion: nil)
+    }
+    
 }
