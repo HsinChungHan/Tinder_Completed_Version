@@ -360,9 +360,30 @@ extension HomeViewController: CardViewDelegate{
     
     func didPressMoreInfoButton(cardViewModel: CardViewModel) {
         let userDetailVC = UserDetailController()
+        userDetailVC.delegate = self
         userDetailVC.cardViewModel = cardViewModel
         present(userDetailVC, animated: true, completion: nil)
     }
     
     
 }
+
+
+extension HomeViewController: UserDetailControllerDelegate{
+    func nope(userDetailController: UserDetailController) {
+        userDetailController.dismiss(animated: true) {
+            self.handleDislike()
+        }
+    }
+    
+    func like(userDetailController: UserDetailController) {
+        userDetailController.dismiss(animated: true) {
+            self.handleLike()
+        }
+    }
+    
+}
+
+
+
+

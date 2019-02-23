@@ -9,8 +9,14 @@
 import UIKit
 import SDWebImage
 
+protocol UserDetailControllerDelegate {
+    func nope(userDetailController: UserDetailController)
+    func like(userDetailController: UserDetailController)
+}
+
 class UserDetailController: UIViewController {
-    
+    var delegate: UserDetailControllerDelegate?
+
     //You should really create a differnet viewModel for UserDetail Viewmodel
     var cardViewModel: CardViewModel?{
         didSet{
@@ -68,12 +74,15 @@ class UserDetailController: UIViewController {
     //3 bottom control buttons
     lazy var dislikeButton = self.createButton(image: #imageLiteral(resourceName: "dismiss_circle"), selector: #selector(handleDislike))
     @objc func handleDislike(){
-        
+        delegate?.nope(userDetailController: self)
     }
     
     lazy var superlikeButton = self.createButton(image: #imageLiteral(resourceName: "super_like_circle"), selector: #selector(handleDislike))
     
-    lazy var likeButton = self.createButton(image: #imageLiteral(resourceName: "like_circle"), selector: #selector(handleDislike))
+    lazy var likeButton = self.createButton(image: #imageLiteral(resourceName: "like_circle"), selector: #selector(handleLike))
+    @objc func handleLike(){
+        delegate?.like(userDetailController: self)
+    }
     
     
     
